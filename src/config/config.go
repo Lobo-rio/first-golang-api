@@ -15,7 +15,7 @@ var (
 	SecretKey          []byte
 )
 
-func loadConfig() {
+func LoadConfig() {
 	var err error
 
 	if err = godotenv.Load(); err != nil {

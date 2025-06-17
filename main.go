@@ -2,13 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"modules/src/config"
+	"modules/src/routing"
 	"net/http"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, World!")
-	})
+	config.LoadConfig()
+	r := routing.Generate()
 
-	http.ListenAndServe(":8080", nil)
+	fmt.Printf("Escutando na porta %d\n", config.Port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), r))
 }
