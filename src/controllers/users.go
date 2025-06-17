@@ -3,148 +3,154 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"modules/src/database"
+	"modules/src/models"
+	"modules/src/repositories"
+	"modules/src/responses"
 
 	"github.com/gorilla/mux"
 )
 
 // Create insere um usuário no banco de dados
 func Create(w http.ResponseWriter, r *http.Request) {
-	corpoRequest, erro := ioutil.ReadAll(r.Body)
-	if erro != nil {
-		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
+	request, err := io.ReadAll(r.Body)
+	if err != nil {
+		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	var usuario modelos.Usuario
-	if erro = json.Unmarshal(corpoRequest, &usuario); erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
+	var user models.User
+	if err = json.Unmarshal(request, &user); err != nil {
+		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	if erro = usuario.Preparar("cadastro"); erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
+	if err = user.Prepare("cadastro"); err != nil {
+		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	db, erro := banco.Conectar()
-	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+	db, err := database.Connect()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 	defer db.Close()
 
-	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
-	usuario.ID, erro = repositorio.Criar(usuario)
-	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+	repository := repositories.UserRepo(db)
+	user.ID, err = repository.Create(user)
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	respostas.JSON(w, http.StatusCreated, usuario)
+	responses.JSON(w, http.StatusCreated, user)
 }
 
 // GetAll busca todos os usuários salvos no banco
 func GetAll(w http.ResponseWriter, r *http.Request) {
-	nomeOuNick := strings.ToLower(r.URL.Query().Get("usuario"))
-	db, erro := banco.Conectar()
-	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+	nameOrNickName := strings.ToLower(r.URL.Query().Get("usuario"))
+	db, err := database.Connect()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 	defer db.Close()
 
-	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
-	usuarios, erro := repositorio.Buscar(nomeOuNick)
-	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+	repository := repositories.UserRepo(db)
+	user, err := repository.GetAll(nameOrNickName)
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	respostas.JSON(w, http.StatusOK, usuarios)
+	responses.JSON(w, http.StatusOK, user)
 }
 
 // GetById busca um usuário salvo no banco
 func GetById(w http.ResponseWriter, r *http.Request) {
-	parametros := mux.Vars(r)
+	parameters := mux.Vars(r)
 
-	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
-	if erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
+	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
+	if err != nil {
+		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	db, erro := banco.Conectar()
-	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+	db, err := database.Connect()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 	defer db.Close()
 
-	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
-	usuario, erro := repositorio.BuscarPorID(usuarioID)
-	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+	repository := repositories.UserRepo(db)
+	user, err := repository.GetById(userID)
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	respostas.JSON(w, http.StatusOK, usuario)
+	responses.JSON(w, http.StatusOK, user)
 }
 
 // Update altera as informações de um usuário no banco
 func Update(w http.ResponseWriter, r *http.Request) {
-	parametros := mux.Vars(r)
-	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
-	if erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
+	parameters := mux.Vars(r)
+	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
+	if err != nil {
+		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
-	if erro != nil {
-		respostas.Erro(w, http.StatusUnauthorized, erro)
+	userIDNoToken, err := authentication.ExtrairUsuarioID(r)
+	if err != nil {
+		responses.Error(w, http.StatusUnauthorized, err)
 		return
 	}
 
 	if usuarioID != usuarioIDNoToken {
-		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível atualizar um usuário que não seja o seu"))
+		responses.Erro(w, http.StatusForbidden, errors.New("Não é possível atualizar um usuário que não seja o seu"))
 		return
 	}
 
 	corpoRequisicao, erro := ioutil.ReadAll(r.Body)
 	if erro != nil {
-		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
+		responses.Erro(w, http.StatusUnprocessableEntity, erro)
 		return
 	}
 
 	var usuario modelos.Usuario
 	if erro = json.Unmarshal(corpoRequisicao, &usuario); erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
+		responses.Erro(w, http.StatusBadRequest, erro)
 		return
 	}
 
 	if erro = usuario.Preparar("edicao"); erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
+		responses.Erro(w, http.StatusBadRequest, erro)
 		return
 	}
 
 	db, erro := banco.Conectar()
 	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+		responses.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
 	if erro = repositorio.Atualizar(usuarioID, usuario); erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+		responses.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 
-	respostas.JSON(w, http.StatusNoContent, nil)
+	responses.JSON(w, http.StatusNoContent, nil)
 }
 
 // Delete exclui as informações de um usuário no banco
@@ -152,33 +158,33 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
 	if erro != nil {
-		respostas.Erro(w, http.StatusBadRequest, erro)
+		responses.Erro(w, http.StatusBadRequest, erro)
 		return
 	}
 
 	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
-		respostas.Erro(w, http.StatusUnauthorized, erro)
+		responses.Erro(w, http.StatusUnauthorized, erro)
 		return
 	}
 
 	if usuarioID != usuarioIDNoToken {
-		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível deletar um usuário que não seja o seu"))
+		responses.Erro(w, http.StatusForbidden, errors.New("Não é possível deletar um usuário que não seja o seu"))
 		return
 	}
 
 	db, erro := banco.Conectar()
 	if erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+		responses.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
 	if erro = repositorio.Deletar(usuarioID); erro != nil {
-		respostas.Erro(w, http.StatusInternalServerError, erro)
+		responses.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 
-	respostas.JSON(w, http.StatusNoContent, nil)
+	responses.JSON(w, http.StatusNoContent, nil)
 }
