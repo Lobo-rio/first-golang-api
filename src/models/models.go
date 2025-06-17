@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"modules/src/security"
 	"strings"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 type User struct {
 	ID        uint64    `json:"id,omitempty"`
 	Name      string    `json:"nome,omitempty"`
-	Nick      string    `json:"nick,omitempty"`
+	NickName  string    `json:"nick,omitempty"`
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"senha,omitempty"`
 	CreatedAt time.Time `json:"CriadoEm,omitempty"`
@@ -35,7 +36,7 @@ func (user *User) validate(step string) error {
 		return errors.New("O nome é obrigatório e não pode estar em branco")
 	}
 
-	if user.Nick == "" {
+	if user.NickName == "" {
 		return errors.New("O nick é obrigatório e não pode estar em branco")
 	}
 
@@ -54,18 +55,18 @@ func (user *User) validate(step string) error {
 	return nil
 }
 
-func (usuario *Usuario) formatar(etapa string) error {
-	usuario.Nome = strings.TrimSpace(usuario.Nome)
-	usuario.Nick = strings.TrimSpace(usuario.Nick)
-	usuario.Email = strings.TrimSpace(usuario.Email)
+func (user *User) format(etapa string) error {
+	user.Name = strings.TrimSpace(user.Name)
+	user.NickName = strings.TrimSpace(user.NickName)
+	user.Email = strings.TrimSpace(user.Email)
 
-	if etapa == "cadastro" {
-		senhaComHash, erro := seguranca.Hash(usuario.Senha)
-		if erro != nil {
-			return erro
+	if etapa == "registration" {
+		hash, err := security.Hash(user.Password)
+		if err != nil {
+			return err
 		}
 
-		usuario.Senha = string(senhaComHash)
+		user.Password = string(hash)
 	}
 
 	return nil
