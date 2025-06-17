@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"modules/src/authentication"
 	"modules/src/database"
 	"modules/src/models"
 	"modules/src/repositories"
@@ -109,44 +109,44 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userIDNoToken, err := authentication.ExtrairUsuarioID(r)
+	userIDNoToken, err := authentication.ExtractUserID(r)
 	if err != nil {
 		responses.Error(w, http.StatusUnauthorized, err)
 		return
 	}
 
-	if usuarioID != usuarioIDNoToken {
-		responses.Erro(w, http.StatusForbidden, errors.New("Não é possível atualizar um usuário que não seja o seu"))
+	if userID != userIDNoToken {
+		responses.Error(w, http.StatusForbidden, errors.New("Não é possível atualizar um usuário que não seja o seu"))
 		return
 	}
 
-	corpoRequisicao, erro := ioutil.ReadAll(r.Body)
+	request, erro := io.ReadAll(r.Body)
+	if err != nil {
+		responses.Error(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	var user models.User
+	if err = json.Unmarshal(request, &user); err != nil {
+		responses.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err = user.Prepare("edit"); err != nil {
+		responses.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := database.Connect()
 	if erro != nil {
-		responses.Erro(w, http.StatusUnprocessableEntity, erro)
-		return
-	}
-
-	var usuario modelos.Usuario
-	if erro = json.Unmarshal(corpoRequisicao, &usuario); erro != nil {
-		responses.Erro(w, http.StatusBadRequest, erro)
-		return
-	}
-
-	if erro = usuario.Preparar("edicao"); erro != nil {
-		responses.Erro(w, http.StatusBadRequest, erro)
-		return
-	}
-
-	db, erro := banco.Conectar()
-	if erro != nil {
-		responses.Erro(w, http.StatusInternalServerError, erro)
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 	defer db.Close()
 
-	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
-	if erro = repositorio.Atualizar(usuarioID, usuario); erro != nil {
-		responses.Erro(w, http.StatusInternalServerError, erro)
+	repository := repositories.UserRepo(db)
+	if err = repository.Update(userID, user); err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -155,34 +155,34 @@ func Update(w http.ResponseWriter, r *http.Request) {
 
 // Delete exclui as informações de um usuário no banco
 func Delete(w http.ResponseWriter, r *http.Request) {
-	parametros := mux.Vars(r)
-	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
-	if erro != nil {
-		responses.Erro(w, http.StatusBadRequest, erro)
+	parameters := mux.Vars(r)
+	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
+	if err != nil {
+		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
 
-	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
-	if erro != nil {
-		responses.Erro(w, http.StatusUnauthorized, erro)
+	userIDNoToken, err := authentication.ExtractUserID(r)
+	if err != nil {
+		responses.Error(w, http.StatusUnauthorized, err)
 		return
 	}
 
-	if usuarioID != usuarioIDNoToken {
-		responses.Erro(w, http.StatusForbidden, errors.New("Não é possível deletar um usuário que não seja o seu"))
+	if userID != userIDNoToken {
+		responses.Error(w, http.StatusForbidden, errors.New("Não é possível deletar um usuário que não seja o seu"))
 		return
 	}
 
-	db, erro := banco.Conectar()
-	if erro != nil {
-		responses.Erro(w, http.StatusInternalServerError, erro)
+	db, err := database.Connect()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 	defer db.Close()
 
-	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
-	if erro = repositorio.Deletar(usuarioID); erro != nil {
-		responses.Erro(w, http.StatusInternalServerError, erro)
+	repository := repositories.UserRepo(db)
+	if err = repository.Delete(userID); err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
 

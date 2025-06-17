@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Generate() {
+func Generate() *mux.Router {
 	r := mux.NewRouter()
 	return routers.Configure(r)
 }

@@ -1,6 +1,9 @@
 package routers
 
-import "net/http"
+import (
+	"modules/src/controllers"
+	"net/http"
+)
 
 var users = []Router{
 	{
@@ -12,13 +15,13 @@ var users = []Router{
 	{
 		URI:                "/users",
 		Method:             http.MethodGet,
-		Function:             controllers.getAll,
+		Function:             controllers.GetAll,
 		Authentication: true,
 	},
 	{
 		URI:                "/users/{userId}",
 		Method:             http.MethodGet,
-		Function:             controllers.getById,
+		Function:             controllers.GetById,
 		Authentication: true,
 	},
 	{
