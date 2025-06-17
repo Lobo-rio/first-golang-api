@@ -2,35 +2,35 @@ package routers
 
 import "net/http"
 
-var rotasUsuarios = []Router{
+var users = []Router{
 	{
-		URI:                "/usuarios",
+		URI:                "/users",
 		Method:             http.MethodPost,
-		Function:             controllers.CriarUsuario,
+		Function:             controllers.Create,
 		Authentication: false,
 	},
 	{
-		URI:                "/usuarios",
+		URI:                "/users",
 		Method:             http.MethodGet,
-		Function:             controllers.BuscarUsuarios,
+		Function:             controllers.getAll,
 		Authentication: true,
 	},
 	{
-		URI:                "/usuarios/{usuarioId}",
+		URI:                "/users/{userId}",
 		Method:             http.MethodGet,
-		Function:             controllers.BuscarUsuario,
+		Function:             controllers.getById,
 		Authentication: true,
 	},
 	{
-		URI:                "/usuarios/{usuarioId}",
+		URI:                "/users/{userId}",
 		Method:             http.MethodPut,
-		Function:             controllers.AtualizarUsuario,
+		Function:             controllers.Update,
 		Authentication: true,
 	},
 	{
-		URI:                "/usuarios/{usuarioId}",
+		URI:                "/users/{usuarioId}",
 		Method:             http.MethodDelete,
-		Function:             controllers.DeletarUsuario,
+		Function:             controllers.Delete,
 		Authentication: true,
 	},
 }
