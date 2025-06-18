@@ -22,12 +22,12 @@ func LoadConfig() {
 		log.Fatal(err)
 	}
 
-	Port, err = strconv.Atoi(os.Getenv("API_PORT"))
+	Port, err = strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
 		Port = 5000
 	}
 
-	StringConnectionDB = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
+	StringConnectionDB = fmt.Sprintf("%s:%s@/%s?allowPublicKeyRetrieval=true&useSSL=false",
 		os.Getenv("MYSQL_USER"),
 		os.Getenv("MYSQL_PASSWORD"),
 		os.Getenv("MYSQL_DATABASE"),
