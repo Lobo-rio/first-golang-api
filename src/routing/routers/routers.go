@@ -14,7 +14,7 @@ type Router struct {
 	Authentication    bool
 }
 
-// Configurar coloca todas as rotas dentro do router
+// Configure function that puts all routes inside the main call
 func Configure(r *mux.Router) *mux.Router {
 	routers := users
 	routers = append(routers, login)

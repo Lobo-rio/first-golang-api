@@ -17,7 +17,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Create insere um usuário no banco de dados
+// Create function that calls the modules to insert a user in the database
 func Create(w http.ResponseWriter, r *http.Request) {
 	request, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -53,7 +53,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, user)
 }
 
-// GetAll busca todos os usuários salvos no banco
+// GetAll function that retrieves all users saved in the database
 func GetAll(w http.ResponseWriter, r *http.Request) {
 	nameOrNickName := strings.ToLower(r.URL.Query().Get("usuario"))
 	db, err := database.Connect()
@@ -73,7 +73,7 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, user)
 }
 
-// GetById busca um usuário salvo no banco
+// GetById function that retrieves a user saved in the database
 func GetById(w http.ResponseWriter, r *http.Request) {
 	parameters := mux.Vars(r)
 
@@ -100,7 +100,7 @@ func GetById(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, user)
 }
 
-// Update altera as informações de um usuário no banco
+// Update function that alters the information of a user in the database
 func Update(w http.ResponseWriter, r *http.Request) {
 	parameters := mux.Vars(r)
 	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
@@ -153,7 +153,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusNoContent, nil)
 }
 
-// Delete exclui as informações de um usuário no banco
+// Delete function that removes a user's information from the database
 func Delete(w http.ResponseWriter, r *http.Request) {
 	parameters := mux.Vars(r)
 	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)

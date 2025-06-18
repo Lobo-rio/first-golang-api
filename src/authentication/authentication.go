@@ -12,7 +12,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-// CreateToken retorna um token assinado com as permissões do usuário
+// CreateToken function that aims to return a token signed with the user's permissions
 func CreateToken(userID uint64) (string, error) {
 	permissions := jwt.MapClaims{}
 	permissions["authorized"] = true
@@ -22,7 +22,7 @@ func CreateToken(userID uint64) (string, error) {
 	return token.SignedString([]byte(config.SecretKey))
 }
 
-// ValidateToken verifica se o token passado na requisição é valido
+// ValidateToken function that checks whether the token passed in the request is valid
 func ValidateToken(r *http.Request) error {
 	tokenString := extractToken(r)
 	token, err := jwt.Parse(tokenString, returnVerificationKey)
@@ -37,7 +37,7 @@ func ValidateToken(r *http.Request) error {
 	return errors.New("Token inválido")
 }
 
-// ExtractUserID retorna o usuarioId que está salvo no token
+// ExtractUserID function that returns the userId that is saved in the token
 func ExtractUserID(r *http.Request) (uint64, error) {
 	tokenString := extractToken(r)
 	token, err := jwt.Parse(tokenString, returnVerificationKey)

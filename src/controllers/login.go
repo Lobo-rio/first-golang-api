@@ -13,7 +13,7 @@ import (
 	"strconv"
 )
 
-// Login é responsável por autenticar um usuário na API
+// Login function that is responsible for authenticating a user in the API
 func Login(w http.ResponseWriter, r *http.Request) {
 	request, err := io.ReadAll(r.Body)
 	if err != nil {

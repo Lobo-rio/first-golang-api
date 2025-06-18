@@ -15,7 +15,7 @@ func Logger(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-// Authenticate verifica se o usuário fazendo a requisição está autenticado
+// Authenticate function that checks whether the user making the request is authenticated
 func Authenticate(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := authentication.ValidateToken(r); err != nil {

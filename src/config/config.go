@@ -15,6 +15,7 @@ var (
 	SecretKey          []byte
 )
 
+/// LoadConfig function loads the environment variables and sets the configuration values
 func LoadConfig() {
 	var err error
 
