@@ -31,7 +31,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = user.Prepare("cadastro"); err != nil {
+	if err = user.Prepare("registration"); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}

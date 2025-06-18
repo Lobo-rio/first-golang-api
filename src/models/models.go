@@ -11,11 +11,11 @@ import (
 
 type User struct {
 	ID        uint64    `json:"id,omitempty"`
-	Name      string    `json:"nome,omitempty"`
-	NickName  string    `json:"nick_name,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	NickName  string    `json:"nickname,omitempty"`
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"password,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"createdat,omitempty"`
 }
 
 // Prepare vai chamar os métodos para validar e formatar o usuário recebido

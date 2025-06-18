@@ -27,9 +27,11 @@ func LoadConfig() {
 		Port = 5000
 	}
 
-	StringConnectionDB = fmt.Sprintf("%s:%s@/%s?allowPublicKeyRetrieval=true&useSSL=false",
+	StringConnectionDB = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		os.Getenv("MYSQL_USER"),
 		os.Getenv("MYSQL_PASSWORD"),
+		os.Getenv("MYSQL_HOST"),
+		os.Getenv("MYSQL_PORT"),
 		os.Getenv("MYSQL_DATABASE"),
 	)
 
