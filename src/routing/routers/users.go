@@ -31,7 +31,7 @@ var users = []Router{
 		Authentication: true,
 	},
 	{
-		URI:                "/users/{usuarioId}",
+		URI:                "/users/{userId}",
 		Method:             http.MethodDelete,
 		Function:             controllers.Delete,
 		Authentication: true,
