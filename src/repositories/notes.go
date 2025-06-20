@@ -17,7 +17,7 @@ func NoteRepo(db *sql.DB) *Notes {
 // Create function used to insert a note into the database
 func (repository Notes) Create(note models.Note) (uint64, error) {
 	statement, err := repository.db.Prepare(
-		"INSERT INTO notes (title, description, user_id) VALUES(?, ?, ?)",
+		"INSERT INTO notes (title, description, author_id) VALUES(?, ?, ?)",
 	)
 	if err != nil {
 		return 0, err
@@ -41,7 +41,7 @@ func (repository Notes) Create(note models.Note) (uint64, error) {
 // GetAll function used to retrieve all notes that meet a nickname filter
 func (repository Notes) GetAll(authorID uint64) ([]models.Note, error) {
 	lines, err := repository.db.Query(
-		`SELECT n*, u.nick_name FROM notes n
+		`SELECT n.*, u.nick_name FROM notes n
 		inner join users u on u.id = n.author_id
 		WHERE n.author_id = ?`,
 		authorID,
@@ -63,6 +63,7 @@ func (repository Notes) GetAll(authorID uint64) ([]models.Note, error) {
 			&note.Content,
 			&note.AuthorID,
 			&note.CreatedAt,
+			&note.AuthorNickName,
 		); err != nil {
 			return nil, err
 		}
@@ -76,7 +77,7 @@ func (repository Notes) GetAll(authorID uint64) ([]models.Note, error) {
 // GetByID function used to retrieve a note by its ID
 func (repository Notes) GetByID(noteID uint64) (models.Note, error) {
 	line, err := repository.db.Query(
-		`SELECT n*, u.nick_name FROM notes n inner join users u on u.id = n.author_id WHERE n.id = ?`,
+		`SELECT n.*, u.nick_name FROM notes n inner join users u on u.id = n.author_id WHERE n.id = ?`,
 		noteID,
 	)
 	if err != nil {

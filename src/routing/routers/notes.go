@@ -20,7 +20,7 @@ var notes = []Router{
 	},
 	{
 		URI:      "/notes/{noteId}",
-		Method:   http.MethodPost,
+		Method:   http.MethodGet,
 		Function: controllers.GetByIDNote,
 		Authentication:     true,
 	},
