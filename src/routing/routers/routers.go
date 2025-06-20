@@ -18,7 +18,7 @@ type Router struct {
 func Configure(r *mux.Router) *mux.Router {
 	routers := users
 	routers = append(routers, login)
-	routers = append(routers, notes...)
+	//routers = append(routers, notes...)
 
 	for _, router := range routers {
 

@@ -117,11 +117,11 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userID != userIDNoToken {
-		responses.Error(w, http.StatusForbidden, errors.New("Não é possível atualizar um usuário que não seja o seu"))
+		responses.Error(w, http.StatusForbidden, errors.New("não é possível atualizar um usuário que não seja o seu"))
 		return
 	}
 
-	request, erro := io.ReadAll(r.Body)
+	request, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
@@ -139,7 +139,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db, err := database.Connect()
-	if erro != nil {
+	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -170,7 +170,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userID != userIDNoToken {
-		responses.Error(w, http.StatusForbidden, errors.New("Não é possível deletar um usuário que não seja o seu"))
+		responses.Error(w, http.StatusForbidden, errors.New("não é possível deletar um usuário que não seja o seu"))
 		return
 	}
 
@@ -206,11 +206,15 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userIDToken != userID {
-		responses.Error(w, http.StatusForbidden, errors.New("Não é possível atualizar a senha de um usuário que não seja o seu"))
+		responses.Error(w, http.StatusForbidden, errors.New("não é possível atualizar a senha de um usuário que não seja o seu"))
 		return
 	}
 
 	request, err := io.ReadAll(r.Body)
+	if err != nil {
+		responses.Error(w, http.StatusUnprocessableEntity, err)
+		return
+	}
 	var password models.Password
 	if err = json.Unmarshal(request, &password); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
@@ -232,7 +236,7 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = security.Verify(passwordDatabase, password.CurrentPassword); err != nil {
-		responses.Error(w, http.StatusUnauthorized, errors.New("A senha atual não condiz com a que está salva no banco"))
+		responses.Error(w, http.StatusUnauthorized, errors.New("a senha atual não condiz com a que está salva no banco"))
 		return
 	}
 

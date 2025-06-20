@@ -21,11 +21,11 @@ type User struct {
 }
 
 
-var validate *validator.Validate
+var validateUser *validator.Validate
 
 // Prepare function used to call the methods to validate and format the received user!
 func (user *User) Prepare(step string) error {
-	validate = validator.New(validator.WithRequiredStructEnabled())
+	validateUser = validator.New(validator.WithRequiredStructEnabled())
 
 	if err := user.validateStruct(); err != nil {
 		return err
@@ -44,7 +44,7 @@ func (user *User) Prepare(step string) error {
 
 func (user *User) validateStruct() error {
 
-	err := validate.Struct(user)
+	err := validateUser.Struct(user)
 	if err != nil {
 
 		var invalidValidationError *validator.InvalidValidationError
@@ -77,7 +77,7 @@ func (user *User) validateStruct() error {
 }
 
 func (user *User) validateVariable() error {
-    err := validate.Var(user.Email, "required,email")
+    err := validateUser.Var(user.Email, "required,email")
 
 	if err != nil {
 		fmt.Println(err) 

@@ -18,11 +18,11 @@ type Note struct {
 	CreatedAt time.Time `json:"createdat,omitempty"`
 }
 
-var validate *validator.Validate
+var validateNote *validator.Validate
 
 // Prepare function used to call the methods to validate and format the received user!
 func (note *Note) Prepare(step string) error {
-	validate = validator.New(validator.WithRequiredStructEnabled())
+	validateNote = validator.New(validator.WithRequiredStructEnabled())
 
 	if err := note.validateStruct(); err != nil {
 		return err
@@ -37,7 +37,7 @@ func (note *Note) Prepare(step string) error {
 
 func (note *Note) validateStruct() error {
 
-	err := validate.Struct(note)
+	err := validateNote.Struct(note)
 	if err != nil {
 
 		var invalidValidationError *validator.InvalidValidationError
