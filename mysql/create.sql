@@ -17,10 +17,10 @@ CREATE TABLE users(
 CREATE TABLE notes(
     id int auto_increment primary key,
     title varchar(50) not null,
-    description varchar(300) not null
+    description varchar(300) not null,
 
     author_id int not null,
-    FOREIGN KEY (autor_id)
+    FOREIGN KEY (author_id)
     REFERENCES users(id)
     ON DELETE CASCADE,
 

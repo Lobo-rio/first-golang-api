@@ -39,9 +39,11 @@ func (repository Notes) Create(note models.Note) (uint64, error) {
 }
 
 // GetAll function used to retrieve all notes that meet a nickname filter
-func (repository Notes) GetAll(authorID string) ([]models.Note, error) {
+func (repository Notes) GetAll(authorID uint64) ([]models.Note, error) {
 	lines, err := repository.db.Query(
-		"SELECT id, title, content, author_id, created_at FROM notes WHERE author_id = ?",
+		`SELECT n*, u.nick_name FROM notes n
+		inner join users u on u.id = n.author_id
+		WHERE n.author_id = ?`,
 		authorID,
 	)
 
@@ -74,7 +76,7 @@ func (repository Notes) GetAll(authorID string) ([]models.Note, error) {
 // GetByID function used to retrieve a note by its ID
 func (repository Notes) GetByID(noteID uint64) (models.Note, error) {
 	line, err := repository.db.Query(
-		"SELECT id, title, content, author_id, created_at FROM notes WHERE id = ?",
+		`SELECT n*, u.nick_name FROM notes n inner join users u on u.id = n.author_id WHERE n.id = ?`,
 		noteID,
 	)
 	if err != nil {

@@ -54,9 +54,9 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, user)
 }
 
-// GetAll function that retrieves all users saved in the database
+// GetAllUsers function that retrieves all users saved in the database
 func GetAll(w http.ResponseWriter, r *http.Request) {
-	nameOrNickName := strings.ToLower(r.URL.Query().Get("usuario"))
+	nameOrNickName := strings.ToLower(r.URL.Query().Get("user"))
 	db, err := database.Connect()
 	if err != nil {
 		responses.Error(w, http.StatusInternalServerError, err)
