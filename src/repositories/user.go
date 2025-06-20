@@ -6,7 +6,7 @@ import (
 	"modules/src/models"
 )
 
-// Users representa um repositório de usuarios
+// Users function that represents a repository of users
 type Users struct {
 	db *sql.DB
 }
