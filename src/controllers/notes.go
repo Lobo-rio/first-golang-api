@@ -128,9 +128,8 @@ func UpdateNote(w http.ResponseWriter, r *http.Request) {
 		responses.Error(w, http.StatusUnauthorized, err)
 		return
 	}
-
 	parameters := mux.Vars(r)
-	noteID, erro := strconv.ParseUint(parameters["publicacaoId"], 10, 64)
+	noteID, erro := strconv.ParseUint(parameters["noteId"], 10, 64)
 	if erro != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
@@ -149,29 +148,29 @@ func UpdateNote(w http.ResponseWriter, r *http.Request) {
 		responses.Error(w, http.StatusInternalServerError, err)
 		return
 	}
-
 	if noteDatabase.AuthorID != userID {
 		responses.Error(w, http.StatusForbidden, errors.New("não é possível visualizar uma anotação que não seja sua"))
 		return
 	}
-
+	
 	request, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-
+	
 	var note models.Note
 	if err = json.Unmarshal(request, &note); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
-
+	
+	
 	if err = note.Prepare("edit"); err != nil {
 		responses.Error(w, http.StatusBadRequest, err)
 		return
 	}
-
+	
 	if err = repository.Update(noteID, note); err != nil {
 		responses.Error(w, http.StatusInternalServerError, erro)
 		return

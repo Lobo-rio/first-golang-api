@@ -24,7 +24,7 @@ func (repository Notes) Create(note models.Note) (uint64, error) {
 	}
 	defer statement.Close()
 
-	result, err := statement.Exec(note.Title, note.Content, note.AuthorID)
+	result, err := statement.Exec(note.Title, note.Description, note.AuthorID)
 	if err != nil {
 		return 0, err
 	}
@@ -60,7 +60,7 @@ func (repository Notes) GetAll(authorID uint64) ([]models.Note, error) {
 		if err = lines.Scan(
 			&note.ID,
 			&note.Title,
-			&note.Content,
+			&note.Description,
 			&note.AuthorID,
 			&note.CreatedAt,
 			&note.AuthorNickName,
@@ -89,9 +89,10 @@ func (repository Notes) GetByID(noteID uint64) (models.Note, error) {
 		if err = line.Scan(
 			&note.ID,
 			&note.Title,
-			&note.Content,
+			&note.Description,
 			&note.AuthorID,
 			&note.CreatedAt,
+			&note.AuthorNickName,
 		); err != nil {
 			return models.Note{}, err
 		}
@@ -102,14 +103,14 @@ func (repository Notes) GetByID(noteID uint64) (models.Note, error) {
 // Update function used to change a notes information in the database
 func (repository Notes) Update(ID uint64, note models.Note) error {
 	statement, err := repository.db.Prepare(
-		"UPDATE notes set title = ?, content = ? where id = ?",
+		"UPDATE notes SET title = ?, description = ? where id = ?", 
 	)
 	if err != nil {
 		return err
 	}
 	defer statement.Close()
 
-	if _, err = statement.Exec(note.Title, note.Content, ID); err != nil {
+	if _, err = statement.Exec(note.Title, note.Description, ID); err != nil {
 		return err
 	}
 

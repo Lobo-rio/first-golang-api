@@ -12,7 +12,7 @@ import (
 type Note struct {
 	ID             uint64 `json:"id,omitempty"`
 	Title          string `json:"title,omitempty" validate:"required,min=3,max=50"`
-	Content        string `json:"content,omitempty" validate:"required,min=10,max=300"`
+	Description    string `json:"description,omitempty" validate:"required,min=10,max=300"`
 	AuthorID       uint64 `json:"author_id,omitempty"`
 	AuthorNickName string `json:"author_nickname,omitempty"`
 	CreatedAt time.Time `json:"createdat,omitempty"`
@@ -70,7 +70,7 @@ func (note *Note) validateStruct() error {
 
 func (note *Note) format(etapa string) error {
 	note.Title = strings.TrimSpace(note.Title)
-	note.Content = strings.TrimSpace(note.Content)
+	note.Description = strings.TrimSpace(note.Description)
 
 	return nil
 }
